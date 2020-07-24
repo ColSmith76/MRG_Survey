@@ -1,0 +1,232 @@
+---
+title: "MRG_Survey_Results"
+author: "Colin Smith"
+date: "July 24, 2020"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+    theme: yeti
+    css: "DashboardStyles.css"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r ggplot_Theme}
+theme_db <- theme_bw() + theme(plot.margin = unit(c(10,10,20,10),"pt")) # this should eventually be replaced with an RSG theme, which can be substituted for client themes in conjunction with the dashboard's css file in the YAML header
+```
+
+```{r Map_Settings}
+map_type <- "CartoDB.Positron"
+```
+
+Overview
+============================================
+
+Summary {data-width=150}
+--------------------------------------------
+
+### About this Document
+
+THe dashboard presents analyis of the Mascoma River Greenway user survey. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC.
+
+The survey was developed in collaboration with the Mascoma River Greenway coalition, City of Lebanon, Friends of Lebanon Recreation, Lebanon Pedestrian and Bicyclist Advisory Committee, Upper Valley Trails Alliance, and other groups.
+
+The purpose of the survey was to collect to data to understand current use of the greenway, identify any short term issues and user needs, and to support longer term planning of improvements to the greenway.
+
+Users may navigate to different areas of the dashboard using the navigation bar at the top of the page, and may interact directly with most tables, charts, and maps.
+
+This document is best viewed using the most recent versions of the following web browsers:
+
+* [Google Chrome](https://www.google.com/chrome/browser/desktop/)
+* [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/)
+* Microsoft Edge (Must be running Windows 10)
+
+Highlights {data-width=150}
+--------------------------------------------
+
+### Number of Respondents
+
+```{r}
+value <- format(mrg[, .N], big.mark = ",", trim = TRUE)
+valueBox(value, caption = "Number of Surveys", icon = "fa-check")
+```
+
+Column {data-width=375, .tabset}
+--------------------------------------------
+
+### Respondents by Age
+
+```{r Chart_Resp_by_Age}
+# Organize
+dat <- mrg[,.N, keyby = .(Age = Q_StandardAge)]
+
+# Save
+fwrite(dat, file = "Resp_by_Age.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Age", yvar = "N", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Respondents by Home Location
+
+```{r Chart_Resp_by_Home}
+# Organize
+dat <- mrg[,.N, keyby = .(Municipality, State)]
+dat[, Muni_State := paste(Municipality, State, sep = ", ")]
+dat[N < 10 & State %in% c("NH", "VT"), Muni_State := "Other Town in NH or VT"]
+dat[N < 10 & !State %in% c("NH", "VT"), Muni_State := "Other State"]
+dat[is.na(Municipality), Muni_State := NA]
+dat <- dat[, .(N = sum(N)), by = Muni_State]
+
+# Save
+fwrite(dat, file = "Resp_by_Home.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Muni_State", yvar = "N", xlabel = "Home Municipality", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Respondents by Household Income
+
+```{r Chart_Resp_by_Income}
+# Organize
+dat <- mrg[, .N, keyby = .(Income = XIT_Custom3)]
+
+# Save
+fwrite(dat, file = "Resp_by_Income.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Income", yvar = "N", xlabel = "Household Income", ylabel = "Respondents", xrotate = TRUE)
+```
+
+Column {data-width=375, .tabset}
+--------------------------------------------
+
+### Recreational Use
+
+```{r Chart_Rec_Use}
+# Organize
+dat <- mrg_rec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "Rec_Use.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Recreatonal Use", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Non-Recreational Use
+
+```{r Chart_Trans_Use}
+# Organize
+dat <- mrg_nonrec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "Trans_Use.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatonal Use", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Warmer Months Frequency
+
+```{r Chart_Freq_Warmer}
+# Organize
+dat <- mrg[,.N, keyby = .(Frequency = S2_P1_T0_Q1_Seasonal_Use_1)]
+
+# Save
+fwrite(dat, file = "Freq_Warmer_Months.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Frequency", yvar = "N", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Winter Frequency
+
+```{r Chart_Freq_Winter}
+# Organize
+dat <- mrg[,.N, keyby = .(Frequency = S2_P1_T0_Q2_Seasonal_Use_2)]
+
+# Save
+fwrite(dat, file = "Freq_Winter.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Frequency", yvar = "N", ylabel = "Respondents", xrotate = TRUE)
+```
+
+Experience
+============================================
+
+Column {data-width=375, .tabset}
+--------------------------------------------
+
+### Experience
+
+```{r Chart_Experience}
+# Organize
+dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "MRG_Experience.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Experience", ylabel = "Respondents", xrotate = TRUE)
+```
+
+Column {data-width=375, .tabset}
+--------------------------------------------
+
+### Travel to the MRG
+
+```{r Chart_Travel_Mode}
+# Organize
+dat <- mrg[,.N, keyby = .(Mode = S2_P3_T0_Q1_Getting_to_the_Greenway_1)]
+
+# Save
+fwrite(dat, file = "MRG_Travel_Mode.csv")
+
+# Plot
+bar_plotter(dat, xvar = "Mode", yvar = "N", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Barriers to Walk/Bike Access
+
+```{r Chart_Barriers}
+# Organize
+dat <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "MRG_Barriers.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", xrotate = TRUE)
+```
+
+### Destinations
+
+```{r Chart_Destinations}
+# Organize
+dat <- mrg_dest[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "MRG_Destinations.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Destination", ylabel = "Respondents", xrotate = TRUE)
+```
+
+Column {data-width=375, .tabset}
+--------------------------------------------
+
+### Budget
+
+```{r Chart_Budget}
+# Organize
+dat <- mrg_budget[,.(Amount = sum(Amount, na.rm = TRUE)), keyby = ResponseOption]
+
+# Save
+fwrite(dat, file = "MRG_Budget.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Amount", xlabel = "Budget Item", xrotate = TRUE)
+```
