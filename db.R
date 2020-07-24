@@ -6,7 +6,7 @@
 # read in helper functions and define any necessary objects
 
 # Dashboard Name
-dashboardName <- "MRG_Survey_Results.html"
+dashboardName <- "docs/MRG_Survey_Results.html"
 
 # Support functions
 source("db_build_graphics_functions.R")
