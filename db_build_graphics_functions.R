@@ -229,9 +229,11 @@ bar_plotter <- function(data, xvar, yvar,
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)))) +
       geom_bar(stat = "identity", position = position, fill = "#08519c")
   } else {
+    fill_levels <- uniqueN(data[,get(fill)])
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)), fill = quote(get(fill)))) +
       geom_bar(stat = "identity", position = position) +
-      labs(fill = fill)
+      labs(fill = fill) + 
+      scale_fill_manual(values = rgb(rsgcolordf[2:(fill_levels+1),],maxColorValue = 255))
   }
   p <- p + xlab(xlabel) + ylab(ylabel) +
     theme_db

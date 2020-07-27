@@ -13,7 +13,7 @@ editor_options:
 ---
 
 ```{r ggplot_Theme}
-theme_db <- theme_bw() + theme(plot.margin = unit(c(10,10,20,10),"pt")) # this should eventually be replaced with an RSG theme, which can be substituted for client themes in conjunction with the dashboard's css file in the YAML header
+theme_db <- theme_bw() + theme(plot.margin = unit(c(10,10,20,10),"pt"))
 ```
 
 ```{r Map_Settings}
@@ -72,12 +72,7 @@ bar_plotter(dat, xvar = "Age", yvar = "N", ylabel = "Respondents", xrotate = TRU
 
 ```{r Chart_Resp_by_Home}
 # Organize
-dat <- mrg[,.N, keyby = .(Municipality, State)]
-dat[, Muni_State := paste(Municipality, State, sep = ", ")]
-dat[N < 10 & State %in% c("NH", "VT"), Muni_State := "Other Town in NH or VT"]
-dat[N < 10 & !State %in% c("NH", "VT"), Muni_State := "Other State"]
-dat[is.na(Municipality), Muni_State := NA]
-dat <- dat[, .(N = sum(N)), by = Muni_State]
+dat <- mrg[, .N, by = Muni_State]
 
 # Save
 fwrite(dat, file = "Resp_by_Home.csv")
@@ -164,13 +159,14 @@ Column {data-width=375, .tabset}
 
 ```{r Chart_Experience}
 # Organize
-dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ExperienceType, ResponseOptionShort)][order(-Yes)]
+dat[, ResponseOptionShort := factor(ResponseOptionShort, levels = dat$ResponseOptionShort)]
 
 # Save
 fwrite(dat, file = "MRG_Experience.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Experience", ylabel = "Respondents", xrotate = TRUE)
+bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "ExperienceType", xlabel = "Experience", ylabel = "Respondents", xrotate = TRUE)
 ```
 
 Column {data-width=375, .tabset}
@@ -193,26 +189,26 @@ bar_plotter(dat, xvar = "Mode", yvar = "N", ylabel = "Respondents", xrotate = TR
 
 ```{r Chart_Barriers}
 # Organize
-dat <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+dat <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionShort, BarrierType)]
 
 # Save
 fwrite(dat, file = "MRG_Barriers.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", xrotate = TRUE)
+bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "BarrierType", xlabel = "Barrier", ylabel = "Respondents", xrotate = TRUE)
 ```
 
 ### Destinations
 
 ```{r Chart_Destinations}
 # Organize
-dat <- mrg_dest[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+dat <- mrg_dest[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption, DestType)]
 
 # Save
 fwrite(dat, file = "MRG_Destinations.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Destination", ylabel = "Respondents", xrotate = TRUE)
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", fill = "DestType", xlabel = "Destination", ylabel = "Respondents", xrotate = TRUE)
 ```
 
 Column {data-width=375, .tabset}
