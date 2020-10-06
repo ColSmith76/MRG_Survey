@@ -1,11 +1,11 @@
 ---
-title: "MRG_Survey_Results"
-author: "Colin Smith"
-date: "July 24, 2020"
+title: "MRG_Survey_And_Counts_Results"
+author: "UVLSRPC, City of Lebanon, Lebanon PBAC "
+date: "October 6, 2020"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
-    vertical_layout: fill
+    vertical_layout: scroll
     theme: yeti
     css: "DashboardStyles.css"
 editor_options: 
@@ -28,11 +28,11 @@ Summary {data-width=150}
 
 ### About this Document
 
-THe dashboard presents analyis of the Mascoma River Greenway user survey. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC.
+THe dashboard presents analyis of the Mascoma River Greenway user survey and counts. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC. Counts at two locations on the Mascoma River Greenway were taken by UVLSRPC for two weeks in late July and early August, 2020.
 
-The survey was developed in collaboration with the Mascoma River Greenway coalition, City of Lebanon, Friends of Lebanon Recreation, Lebanon Pedestrian and Bicyclist Advisory Committee, Upper Valley Trails Alliance, and other groups.
+The survey and count program were developed in collaboration with the Mascoma River Greenway coalition, City of Lebanon, Friends of Lebanon Recreation, Lebanon Pedestrian and Bicyclist Advisory Committee, Upper Valley Trails Alliance, and other groups.
 
-The purpose of the survey was to collect to data to understand current use of the greenway, identify any short term issues and user needs, and to support longer term planning of improvements to the greenway.
+The purpose of the survey and counts were to collect data to understand current use of the greenway, identify any short term issues and user needs, and to support longer term planning of improvements to the greenway.
 
 Users may navigate to different areas of the dashboard using the navigation bar at the top of the page, and may interact directly with most tables, charts, and maps.
 
@@ -225,4 +225,145 @@ fwrite(dat, file = "MRG_Budget.csv")
 
 # Plot
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Amount", xlabel = "Budget Item", xrotate = TRUE)
+```
+
+Counts
+============================================
+
+Summary {data-width=200}
+--------------------------------------------
+
+### MRG Counts
+
+UVLSRPC recorded counts at two locations on the Mascoma River Greenway in late July and early August, 2020. The count period lasted for 19 days between July 25th and August 12th and included 6 weekend days and 13 weekdays. The two locations were "East of I-89", between the MRG parking lot at Slayton Hill and the bridge over I-89, and just to the west of the access from the "Price Chopper" parking lot on the Miracle Mile.
+
+The counts are presented in terms of number of unique MRG users. Since most users are making an out and back trip of some kind the counts were factored down to remove duplicate counts of the same people. UVLSRPC also carried out a 3-hour manual calibration count to allow for adjustments of the automated counters, which can under count groups of users if people are walking or biking very close together. The results of the calibration count were used to factor up the counts.
+
+Column {data-width=500}
+--------------------------------------------
+
+### Daily Counts
+
+The daily charts below show that, on an average day, about 240 people use the section of the MRG east of I-89 and about 150 people use the section close to the Price Chopper access. The number of daily users does not vary between weekdays and weekends. The section east of I-89 may be busier as it closer to the more densely populated residential areas around downtown Lebanon and there are more formal access points and trailhead parking lots. 
+
+### Daily Count: East of I-89
+
+```{r Chart_Count_Daily_East_I89}
+# Organize
+dat <- count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst))), 
+             keyby = .(Date, Weekend)]
+dat[, DateFac := factor(Date)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Daily_East_of_I89.csv")
+
+# Plot
+bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
+```
+
+### Daily Count: Price Chopper
+
+```{r Chart_Count_Daily_PC}
+# Organize
+dat <- count_mrg[Location == "Price Chopper",.(Count = round(sum(UsersEst))), 
+             keyby = .(Date, Weekend)]
+dat[, DateFac := factor(Date)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Daily_Price_Chopper.csv")
+
+# Plot
+bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
+```
+
+Column {data-width=500}
+--------------------------------------------
+
+### Impact of High Temperatures and Rain
+
+While the count period had generally consistently dry and warm summer weather, there were some weather events that reduced trail use. On Tuesday August 4th, Tropical Storm Isaias passed through NH and Lebanon saw 1.4 inches of rain, and that day had only around 30 percent of the typical number of users. There was measurable rain (a tenth of an inch or more) on three other days (the four days marked in blue on the chart below were wet). Two days saw excessive heat, with high temperatures of 93F and 94F respectively (these two days are marked in red on the chart below). The second chart below shows that there is some correlation between the daily high temperature and the amount of trail use, with a decline in use as the temperature increases. The range of daily high temperatures in the count period was 78F to 94F.
+
+### Daily Weather
+
+```{r Chart_Count_Daily_Weather}
+# Organize
+dat <- count_mrg[,.(Count = round(sum(UsersEst)), Temperature = max(Temperature), Precip = sum(Precip)/2), 
+             keyby = .(Date)]
+dat[, DateFac := factor(Date)]
+dat[, Hot := ifelse(Temperature > 92,1,0)]
+dat[, Wet := ifelse(Precip > 0,1,0)]
+dat[, Weather := ifelse(Hot == 1 & Wet == 1, "Hot and Rain", ifelse(Hot == 1, "Hot and Dry", ifelse(Wet == 1, "Rain", "Dry and not Hot")))]
+dat[, Weather := factor(Weather, levels = c("Rain", "Dry and not Hot", "Hot and Dry"))]
+
+# Save
+fwrite(dat, file = "MRG_Count_Daily_Weather.csv")
+
+# Plot
+bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weather", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
+
+```
+
+### Daily Max Temperature
+
+```{r Chart_Count_Daily_Max_Temp}
+# Organize
+dat <- count_mrg[,.(Count = round(sum(UsersEst)), Temperature = max(Temperature), Precip = sum(Precip)), 
+             keyby = .(Date, Location)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Daily_Max_Temp.csv")
+
+# Plot
+p <- ggplot(data=dat[Precip == 0], aes(y = Count, x = Temperature, color = Location)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
+  ylab("Daily Count") +
+  xlab("Maximum Temperature (F)") +
+  scale_y_continuous(labels = scales::comma_format()) +
+  scale_x_continuous(labels = scales::comma_format()) +
+  scale_color_manual(values = rgb(mrgcolorsdf[2:3,],maxColorValue = 255))
+ggplotly(p)
+
+
+```
+
+Column {data-width=500}
+--------------------------------------------
+
+### Hourly Profiles
+
+The two charts below show the average hourly counts at the two locations, split between weekdays in blue and weekend days in green. While the daily use is consistent between weekdays and weekends, the times of day that see peak trail use vary between weekdays and weekends. 
+
+Trail use builds quickly early on weekday mornings, with high levels of use in the early morning hours from 6am to 8am and then contuining at that level until 11am. Lunchtime and early afternoon sees a decline in use, with a second higher peak in the late afternoon and early evening from 4pm until 7pm.
+
+Things take a bit longer to get going on weekends with the 5am to 7am hours being much quieter than weekdays. Later in the morning is similar to weekdays and then there is a peak at 11am and a second bump in use after lunch, from 1pm to 3pm. Evening use is slightly lower than the afternoon and lower than evening use on weekdays.
+
+### Hourly Count: East of I-89
+
+```{r Chart_Count_Hourly_East_I89}
+# Organize
+dat <- count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst)/.N)), 
+             keyby = .(Hour, Weekend)]
+dat[, HourFac := factor(Hour)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Hourly_East_of_I89.csv")
+
+# Plot
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
+```
+
+### Hourly Count: Price Chopper
+
+```{r Chart_Count_Hourly_PC}
+# Organize
+dat <- count_mrg[Location == "Price Chopper",.(Count = round(sum(UsersEst)/.N)), 
+             keyby = .(Hour, Weekend)]
+dat[, HourFac := factor(Hour)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Hourly_Price_Chopper.csv")
+
+# Plot
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
 ```

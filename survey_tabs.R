@@ -12,6 +12,11 @@ rsgcolordf <- data.frame(red=c(246,0,99,186,117,255,82),
                          blue=c(31,161,94,34,233,14,133),
                          colornames=c("orange","marine","leaf","cherry","sky","sunshine","violet"))
 
+mrgcolorsdf <- data.frame(red=c(246,0,2,186,117,255,82),
+                          green=c(139,64,128,18,190,194,77),
+                          blue=c(31,128,64,34,233,14,133),
+                          colornames=c("orange","mrgblue","mrggreen","cherry","sky","sunshine","violet"))
+
 ### Read in the data 
 # spreadsheet is MRG_CrossTabs_analysis.xlsx
 # field names and text explanation of field content
@@ -39,6 +44,45 @@ descr <- read.xlsx("MRG CrossTabs_analysis.xlsx",
                    cols = 2:5)
 names(descr) <- c("QuestionNum", "Question", "QuestionResponseOptionID", "ResponseOption")
 descr <- data.table(descr)
+
+# Qualitative coding
+codes_greenway_exp <- read.xlsx("MRG CrossTabs_analysis.xlsx",
+                                sheet = "S2_P2_T0_Q2_Greenway_Experience",
+                                cols = 1:2,
+                                startRow = 2)
+codes_greenway_exp <- data.table(codes_greenway_exp)
+
+codes_destinations <- read.xlsx("MRG CrossTabs_analysis.xlsx",
+                                sheet = "S2_P4_T0_Q2_Trail_Destinations_",
+                                cols = 1:2,
+                                startRow = 2)
+codes_destinations <- data.table(codes_destinations)
+
+codes_comm_value <- read.xlsx("MRG CrossTabs_analysis.xlsx",
+                                sheet = "S2_P5_T0_Q1_Community_Value_1",
+                                cols = 1:2,
+                                startRow = 2)
+codes_comm_value <- data.table(codes_comm_value)
+
+# Counts data are in ./counts/MRG Counts.xlsx
+# counts need to be factored to account for most users doing an out and back
+# also counts need to be adjusted based on calibration count 
+# this adjusts for missed users, e.g., two people walking alongside each other being counted as one person
+count_east_89 <- read.xlsx("./counts/MRG Counts.xlsx", 
+                               sheet = "East of 89 Analysis",
+                               cols = 1:6)
+
+count_price_chopper <- read.xlsx("./counts/MRG Counts.xlsx", 
+                           sheet = "Price Chopper Analysis",
+                           cols = 5:9)
+
+count_factor <- 0.55
+count_calibration <- 1 + (95-75)/75
+
+count_weather <- read.xlsx("./counts/MRG Counts.xlsx", 
+                           sheet = "Weather",
+                           cols = 1:11,
+                           startRow = 2)
 
 ### Definition of complete
 
@@ -172,6 +216,19 @@ experience_short <- data.table(descr[QuestionNum==8, .(QuestionResponseOptionID,
 mrg_experience[experience_short, c("ResponseOptionShort","ExperienceType") := .(i.ResponseOptionShort,i.ExperienceType), on = "ResponseOption"]
 mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionShort, ExperienceType)][order(-Yes)][]
 
+# 9. Please describe any specific experiences or thoughts about the Greenway that you wish to share.
+# Qualitative question, codes in codes_greenway_exp
+cols <- names(mrg)[grep("S2_P2_T0_Q2_Greenway_Experience_3", names(mrg))]
+mrg_exp_qual <- melt(mrg[,c("VisitId", cols), with=FALSE],
+                       id.vars = "VisitId",
+                       variable.name = "QuestionResponseOptionID",
+                       value.name = "Code")
+mrg_exp_qual[codes_greenway_exp[,.(Code, Description)],
+               CodedResponse := i.Description,
+               on = c("Code")]
+
+mrg_exp_qual[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)][]
+
 # 10. How do you usually travel to the Greenway from your home?
 # reorder factor, with Other and then NA labeled as Not Applicable
 # Are NAs those who don't use the greenway? Need a user/non-user flag
@@ -229,6 +286,29 @@ mrg_dest[, ResponseOption := factor(ResponseOption, levels = c(dest_levels, "Oth
 mrg_dest[, DestType := ifelse(ResponseOption == "Stay on Greenway", "Stay on Greenway", "Destination")]
 mrg_dest[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption, DestType)]
 
+# 13. Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.
+cols <- names(mrg)[grep("S2_P4_T0_Q2_Trail_Destinations_CODED", names(mrg))]
+mrg_dest_qual <- melt(mrg[,c("VisitId", cols), with=FALSE],
+                     id.vars = "VisitId",
+                     variable.name = "QuestionResponseOptionID",
+                     value.name = "Code")
+mrg_dest_qual[codes_destinations[,.(Code, Description)],
+             CodedResponse := i.Description,
+             on = c("Code")]
+
+mrg_dest_qual[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)][]
+
+# 14. Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below.
+cols <- names(mrg)[grep("S2_P5_T0_Q1_Community_Value_1_CODED", names(mrg))]
+mrg_comm_val <- melt(mrg[,c("VisitId", cols), with=FALSE],
+                      id.vars = c("VisitId", "S2_P5_T0_Q1_Community_Value_1_CODED_YES/NO/MIXED"),
+                      variable.name = "QuestionResponseOptionID",
+                      value.name = "Code")
+mrg_comm_val[codes_comm_value[,.(Code, Description)],
+              CodedResponse := i.Description,
+              on = c("Code")]
+
+mrg_comm_val[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)][]
 
 # 18. Greenway Budget
 cols <- names(mrg)[grep("S4_", names(mrg))]
@@ -253,3 +333,57 @@ mrg[,.N, keyby = XIT_Custom4][order(-N)]
 
 # 20. Volunteering
 mrg[,.N, keyby = XIT_Custom5][order(-N)]
+
+### Count data analysis
+count_mrg <- rbind(data.table(count_east_89)[,.(Count = sum(Count)), by = .(Date, Day, Weekend, Hour)][, Location := "East of I-89"],
+                   data.table(count_price_chopper)[,.(Date, Day, Count, Weekend, Hour)][, Location := "Price Chopper"])
+count_mrg[, Date := as.Date(paste0("20",Date))]
+
+# correct the weekend field
+count_mrg[, Weekday := weekdays(Date)]
+count_mrg[, Weekend := ifelse(Weekday %in% c("Saturday", "Sunday"),"Weekend","Monday-Friday")]
+
+# Remove any records after August 12
+count_mrg <- count_mrg[Date < "2020-08-13"]
+
+# add any missing hourly records
+count_mrg <- melt(dcast.data.table(count_mrg, 
+                                   Date + Day + Weekday + Weekend + Hour ~ Location, 
+                                   value.var = "Count", 
+                                   fill = 0),
+                  id.vars = c("Date", "Day", "Weekday", "Weekend", "Hour"),
+                  variable.name = "Location",
+                  value.name = "Count")
+
+count_mrg[, Users := Count * count_factor]                   
+count_mrg[, UsersEst := Users * count_calibration]
+
+# add weather conditions for the hour
+count_weather  <- data.table(count_weather)
+count_weather[, Date := as.Date(Date, origin = "1899-12-30")]
+count_weather[, Hour := round(Time * 24) - 1]
+count_weather[`Precip.`==unique(count_weather$`Precip.`)[1]]
+count_weather[, Precip := as.numeric(lapply(strsplit(x = `Precip.`, "", fixed = TRUE),"[[",3))/10]
+count_weather[, Temperature := as.numeric(substr(Temperature,1,2))]
+# Avererage temp and take max precip for each hour
+count_weather_hour <- count_weather[,.(Temperature = round(mean(Temperature)), Precip = max(Precip)), keyby = .(Date, Hour)]
+
+count_mrg[count_weather_hour, c("Temperature", "Precip") := .(i.Temperature, i.Precip), on = c("Date", "Hour")]
+
+# Totals by day and location
+count_mrg[,.(Count = sum(UsersEst), 
+             Temp = round(mean(Temperature)), 
+             MaxTemp = round(max(Temperature)), 
+             Precip = sum(Precip), 
+             HourlyRecords = .N), 
+          by = .(Date, Weekday, Weekend, Location)]
+
+count_mrg[,.(Count = sum(UsersEst)),
+          by = .(Date, Location, Weekend)][,.(sum(Count)/.N), by = Location][]
+count_mrg[,.(Count = sum(UsersEst)),
+          by = .(Date, Location, Weekend)][,.(sum(Count)/.N), by = .(Location, Weekend)][]
+
+# Calculate hourly averages by location and weekday/weekend
+count_mrg[,.(Count = sum(UsersEst), 
+             HourlyRecords = .N), 
+          keyby = .(Hour, Weekend, Location)][, AvCount := Count/HourlyRecords][]
