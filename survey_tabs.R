@@ -148,6 +148,8 @@ mrg[Num_Muncipality < 10 & !State %in% c("NH", "VT"), Muni_State := "Other State
 town_levels <- mrg[, .N, by = Muni_State][order(-N)][!Muni_State %in% c("Other Town in NH or VT", "Other State")]$Muni_State
 mrg[, Muni_State := factor(Muni_State, levels = c(town_levels, "Other Town in NH or VT", "Other State"))]
 mrg[, .N, keyby = Muni_State]
+mrg[, LebRes := ifelse(Muni_State %in% c("WEST LEBANON, NH", "LEBANON, NH"), "Leb Resident", "Not a Leb Res.")]
+
 
 # 3. Income
 mrg[, .N, keyby = XIT_Custom3]
@@ -167,6 +169,7 @@ mrg_rec_use[descr[QuestionNum==4, .(QuestionResponseOptionID, ResponseOption)],
 rec_levels <- mrg_rec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption][order(-Yes)][!ResponseOption %in% c("Other", "I don't use the Greenway for recreation", "I don't use the Greenway at all")]$ResponseOption
 mrg_rec_use[, ResponseOption := factor(ResponseOption, levels = c(rec_levels, "Other", "I don't use the Greenway for recreation", "I don't use the Greenway at all"))]
 mrg_rec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+mrg_rec_use[, UserType := ifelse(ResponseOption %in% c("I don't use the Greenway for recreation", "I don't use the Greenway at all"),"Not a Rec. User", "Recreational User")]
 
 # 5. Which of the following non-recreational activities do you use the Greenway for? Check all that apply.
 # Multiple select, fields S2_P0_T0_Q2
@@ -183,6 +186,7 @@ mrg_nonrec_use[descr[QuestionNum==5, .(QuestionResponseOptionID, ResponseOption)
 nonrec_levels <- mrg_nonrec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption][order(-Yes)][!ResponseOption %in% c("I only use the Greenway for recreation", "I don't use the Greenway at all")]$ResponseOption
 mrg_nonrec_use[, ResponseOption := factor(ResponseOption, levels = c(nonrec_levels, "I only use the Greenway for recreation", "I don't use the Greenway at all"))]
 mrg_nonrec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption]
+mrg_nonrec_use[, UserType := ifelse(ResponseOption %in% c("I only use the Greenway for recreation", "I don't use the Greenway at all"),"Not a Non-Rec. User", "Non-Recreational User")]
 
 # 6. In the warmer months, about how often do you use the Greenway?
 mrg[,.N, keyby = S2_P1_T0_Q1_Seasonal_Use_1]
