@@ -62,7 +62,7 @@ Column {data-width=400}
 
 ### Demographics of Respondents
 
-The majority of respondents who completed the survey were from Lebanon, with about two thirds living in the city. Others in the Upper were also well respresented, and there were also almost a 100 responses from further afield in New Hampshire, Vermont and other states.
+The majority of respondents who completed the survey were from Lebanon, with about two thirds living in the city. Others towns in the Upper Valley were also well respresented, and there were also almost a 100 responses from further afield in New Hampshire, Vermont and other states.
 
 The proportion of survey respondents by age peaked in the 41 to 60 age bracket. There were relatively few responses from younger MRG users (under 25); the survey asked about the age of the respondent and did not include questions about the age of those accompanying the respondents on their trips on the MRG, so we don't have information about, for example, the number of children using the MRG.
 
