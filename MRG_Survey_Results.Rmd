@@ -542,7 +542,8 @@ p <- ggplot(data=dat[Precip == 0], aes(y = Count, x = Temperature, color = Locat
   xlab("Maximum Temperature (F)") +
   scale_y_continuous(labels = scales::comma_format()) +
   scale_x_continuous(labels = scales::comma_format()) +
-  scale_color_manual(values = rgb(mrgcolordf[2:3,],maxColorValue = 255))
+  scale_color_manual(values = rgb(mrgcolordf[2:3,],maxColorValue = 255)) +
+  theme_db
 ggplotly(p)
 
 
