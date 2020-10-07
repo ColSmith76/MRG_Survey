@@ -4,6 +4,7 @@
 library(data.table)
 library(ggplot2)
 library(openxlsx)
+library(sf)
 
 # helpers
 # colors
@@ -12,7 +13,7 @@ rsgcolordf <- data.frame(red=c(246,0,99,186,117,255,82),
                          blue=c(31,161,94,34,233,14,133),
                          colornames=c("orange","marine","leaf","cherry","sky","sunshine","violet"))
 
-mrgcolorsdf <- data.frame(red=c(246,0,2,186,117,255,82),
+mrgcolordf <- data.frame(red=c(246,0,2,186,117,255,82),
                           green=c(139,64,128,18,190,194,77),
                           blue=c(31,128,64,34,233,14,133),
                           colornames=c("orange","mrgblue","mrggreen","cherry","sky","sunshine","violet"))
@@ -337,6 +338,27 @@ mrg[,.N, keyby = XIT_Custom4][order(-N)]
 
 # 20. Volunteering
 mrg[,.N, keyby = XIT_Custom5][order(-N)]
+
+### Analysis of map responses
+
+access_shp <- st_read(file.path("mapping", "current access symbols.shp"))
+access_shp$Respondents <- as.integer(as.character(access_shp$size))
+access_shp$AccessType <-  c("Public", "Private", "Public (Pending)")[match(access_shp$Public, c("Y", "N", "P"))]
+mrg_access <- as.data.table(access_shp)
+
+desired_shp <- st_read(file.path("mapping", "desired access symbols.shp"))
+desired_shp$Respondents <- desired_shp$size
+desired_shp$DesiredOrBarrier <- "Desired Access"
+  
+mrg_desired <- as.data.table(desired_shp)
+
+barriers_shp <- st_read(file.path("mapping", "access barrier symbols.shp"))
+barriers_shp$Barrier <- barriers_shp$name
+barriers_shp$Respondents <- barriers_shp$size
+barriers_shp$DesiredOrBarrier <- "Access Barrier"
+
+desired_barriers_shp <- rbind(desired_shp[!is.na(desired_shp$Respondents),c("id", "name", "Respondents", "DesiredOrBarrier")],
+                          barriers_shp[!is.na(barriers_shp$Respondents),c("id", "name", "Respondents", "DesiredOrBarrier")])
 
 ### Count data analysis
 count_mrg <- rbind(data.table(count_east_89)[,.(Count = sum(Count)), by = .(Date, Day, Weekend, Hour)][, Location := "East of I-89"],

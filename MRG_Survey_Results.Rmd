@@ -288,6 +288,77 @@ fwrite(dat, file = "MRG_Destination_Barriers.csv")
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
+Access Maps {data-icon="fa-map"}
+============================================
+
+Column {data-width=300}
+--------------------------------------------
+
+### Current Access, Desired Access, and Access Barriers
+
+Respondents added maps pins and comments noting the current MRG access locations that they use, their desired access locations, and access barriers that they face.
+
+The most commonly used current access locations are the public access points at each end of the MRG (the east entrance close to downtown Lebanon and at the parking lots at Slayton Hill and APD, and at the western end of the MRG at Glen Road). The access from the Price Chopper parking lot is also used frequently and an agreement with the landowner to formalize this access point is under negotiation by the City of Lebanon.
+
+### Current Access Locations
+
+```{r Chart_Current_Access}
+# Organize
+dat <- mrg_access
+dat[, name := factor(name, levels = dat$name)]
+
+# Save
+fwrite(dat, file = "MRG_Current_Access.csv")
+
+# Plot
+bar_plotter(dat, xvar = "name", yvar = "Respondents", fill = "AccessType", xlabel = "Acccess", ylabel = "Respondents", coord_flip = TRUE)
+```
+
+### Desired Access Locations
+
+```{r Chart_Desired_Access}
+# Organize
+dat <- mrg_desired[!is.na(Respondents)]
+dat[, name := factor(name, levels = dat$name)]
+
+# Save
+fwrite(dat, file = "MRG_Desired_Access.csv")
+
+# Plot
+bar_plotter(dat, xvar = "name", yvar = "Respondents", xlabel = "Acccess", ylabel = "Respondents", coord_flip = TRUE)
+```
+
+Column {data-width=700}
+--------------------------------------------
+
+### Access Map
+
+```{r Map_Access}
+
+tmap_mode("view")
+
+tm_basemap("OpenStreetMap") +
+tm_shape(access_shp) +
+ tm_bubbles(size = "Respondents" ,
+           col = "AccessType",
+           scale = 10,
+           style = "cont",
+           id = "name",
+           title.col = "Current Access Type",
+           palette = rgb(mrgcolordf[2:4,],maxColorValue = 255)) +
+tm_shape(desired_barriers_shp) +
+ tm_bubbles(size = "Respondents" ,
+           col = "DesiredOrBarrier",
+           scale = 5,
+           style = "cont",
+           id = "name",
+           title.col = "Desired Access/Access Barrier",
+           popup.vars = "Respondents",
+           palette = rgb(mrgcolordf[c(1,5),],maxColorValue = 255))
+    
+  
+```
+
 
 MRG Value {data-icon="fa-dollar-sign"}
 ============================================
@@ -295,7 +366,13 @@ MRG Value {data-icon="fa-dollar-sign"}
 Column {data-width=400}
 --------------------------------------------
 
-### Community Resource
+### The MRG as a Community Resource
+
+Respondents to the survey most strongly value the MRG as a safe, car free location to walk and bike. They also strongly value it because it helps them to get outdoors and enjoy the scenery in a healthy way. The MRG also provides a bike and pedestrian connection through Lebanon.
+
+Value is placed on it being flat, paved and smooth, and that is provides a recreation location for residents with limited mobility.
+
+### Community Resource Values
 
 Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below
 
@@ -313,6 +390,10 @@ bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Value", ylabel 
 
 Column {data-width=400}
 --------------------------------------------
+
+### MRG Investment Priorities
+
+Respondents to the survey were asked to allocate a notional budget to various MRG maintenance and improvement options. The largest proportion of the budget was allocated to extending the MRG to West Lebanon, recognizing both the preference amongst respodents for an extension and also the likely cost associated with that project. A close second was a shorter extension from the current western terminus of the MRG to Riverside Park.
 
 ### Budget
 
@@ -461,7 +542,7 @@ p <- ggplot(data=dat[Precip == 0], aes(y = Count, x = Temperature, color = Locat
   xlab("Maximum Temperature (F)") +
   scale_y_continuous(labels = scales::comma_format()) +
   scale_x_continuous(labels = scales::comma_format()) +
-  scale_color_manual(values = rgb(mrgcolorsdf[2:3,],maxColorValue = 255))
+  scale_color_manual(values = rgb(mrgcolordf[2:3,],maxColorValue = 255))
 ggplotly(p)
 
 

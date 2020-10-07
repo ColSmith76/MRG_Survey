@@ -22,6 +22,7 @@ library(scales)
 library(pander)
 library(geojsonlint)
 library(stringr)
+library(tmap)
 
 # Generate dashboard
 rmarkdown::render("MRG_Survey_Results.Rmd",

@@ -233,7 +233,7 @@ bar_plotter <- function(data, xvar, yvar,
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)), fill = quote(get(fill)))) +
       geom_bar(stat = "identity", position = position) +
       labs(fill = fill) + 
-      scale_fill_manual(values = rgb(rsgcolordf[2:(fill_levels+1),],maxColorValue = 255))
+      scale_fill_manual(values = rgb(mrgcolordf[2:(fill_levels+1),],maxColorValue = 255))
   }
   p <- p + xlab(xlabel) + ylab(ylabel) +
     theme_db
