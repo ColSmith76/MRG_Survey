@@ -42,7 +42,7 @@ valueBox(value, caption = "Surveys from City of Lebanon Residents", icon = "fa-c
 
 ### About this Document
 
-THe dashboard presents analyis of the Mascoma River Greenway user survey and counts. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC. Counts at two locations on the Mascoma River Greenway were taken by UVLSRPC for two weeks in late July and early August, 2020.
+The dashboard presents analyis of the Mascoma River Greenway user survey and counts. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC. Counts at two locations on the Mascoma River Greenway were taken by UVLSRPC for two weeks in late July and early August, 2020.
 
 The survey and count program were developed in collaboration with the Mascoma River Greenway coalition, City of Lebanon, Friends of Lebanon Recreation, Lebanon Pedestrian and Bicyclist Advisory Committee, Upper Valley Trails Alliance, and other groups.
 
