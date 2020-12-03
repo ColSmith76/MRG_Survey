@@ -223,7 +223,10 @@ bar_plotter <- function(data, xvar, yvar,
                         fill = "", position = "stack", 
                         xlabel = xvar, ylabel = yvar, 
                         xrotate = FALSE, yrotate = FALSE, 
-                        coord_flip = FALSE, legend_label = TRUE) {
+                        coord_flip = FALSE, 
+                        legend_label = TRUE,
+                        legend_position = "bottom",
+                        useplotly = FALSE) {
   
   if (fill == "") {
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)))) +
@@ -233,7 +236,7 @@ bar_plotter <- function(data, xvar, yvar,
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)), fill = quote(get(fill)))) +
       geom_bar(stat = "identity", position = position) +
       labs(fill = fill) + 
-      scale_fill_manual(values = rgb(mrgcolordf[2:(fill_levels+1),],maxColorValue = 255))
+      scale_fill_manual(values = rgb(mrgcolordf[2:(fill_levels+1),],maxColorValue = 255)) 
   }
   p <- p + xlab(xlabel) + ylab(ylabel) +
     theme_db
@@ -255,27 +258,32 @@ bar_plotter <- function(data, xvar, yvar,
   if (!legend_label) {
     p <- p + labs(fill = "")
   }
-  p <- plotly_build(p)
-  p[["data"]] <- lapply(p[["data"]], function(x) {
-    x[["text"]] <- gsub(x[["text"]], pattern = "get\\(xvar\\)", replacement = xlabel)
-    x[["text"]] <- gsub(x[["text"]], pattern = "get\\(yvar\\)", replacement = ylabel)
-    x[["text"]] <- gsub(x[["text"]], pattern = "get\\(fill\\)", replacement = fill)
-    x[["text"]] <- sapply(x[["text"]], function(y) {
-      long_num <- as.numeric(gsub(y, pattern = gsub(gsub(y, pattern = "[\\+\\*\\(\\)\\[\\]]*", replacement = "."), pattern = "\\d{4,}\\.{0,1}\\d*", replacement = ""), replacement = ""))
-      if (!is.na(long_num)) {
-        y <- gsub(y, pattern = "\\d{4,}", replacement = format(floor(long_num), big.mark = ","))
-      }
-      if (max(data[, get(yvar)]) < 1) {
-        short_num <- as.numeric(gsub(y, pattern = gsub(gsub(y, pattern = "[\\+\\*\\(\\)\\[\\]]*", replacement = "."), pattern = "0\\.\\d*", replacement = ""), replacement = ""))
-        if (!is.na(short_num)) {
-          y <- gsub(y, pattern = "0\\.\\d*", replacement = percent(short_num))
-        }
-      }
-      return(y)
-    }, USE.NAMES = FALSE)
-    return(x)
-  })
+  if (useplotly){
+    p <- plotly_build(p)
   
+    p[["data"]] <- lapply(p[["data"]], function(x) {
+      x[["text"]] <- gsub(x[["text"]], pattern = "get\\(xvar\\)", replacement = xlabel)
+      x[["text"]] <- gsub(x[["text"]], pattern = "get\\(yvar\\)", replacement = ylabel)
+      x[["text"]] <- gsub(x[["text"]], pattern = "get\\(fill\\)", replacement = fill)
+      x[["text"]] <- sapply(x[["text"]], function(y) {
+        long_num <- as.numeric(gsub(y, pattern = gsub(gsub(y, pattern = "[\\+\\*\\(\\)\\[\\]]*", replacement = "."), pattern = "\\d{4,}\\.{0,1}\\d*", replacement = ""), replacement = ""))
+        if (!is.na(long_num)) {
+          y <- gsub(y, pattern = "\\d{4,}", replacement = format(floor(long_num), big.mark = ","))
+        }
+        if (max(data[, get(yvar)]) < 1) {
+          short_num <- as.numeric(gsub(y, pattern = gsub(gsub(y, pattern = "[\\+\\*\\(\\)\\[\\]]*", replacement = "."), pattern = "0\\.\\d*", replacement = ""), replacement = ""))
+          if (!is.na(short_num)) {
+            y <- gsub(y, pattern = "0\\.\\d*", replacement = percent(short_num))
+          }
+        }
+        return(y)
+      }, USE.NAMES = FALSE)
+      return(x)
+    })
+  
+  } else {
+    p <- p + theme(legend.position = legend_position)
+  }
   return(p)
   
 }

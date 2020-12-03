@@ -256,11 +256,6 @@ mrg_barriers[descr[QuestionNum==11, .(QuestionResponseOptionID, ResponseOption)]
 
 mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = ResponseOption][order(-Yes)][]
 
-# order repsonses with not barrier at end
-barriers_levels <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), by = ResponseOptionShort][order(-Yes)][!ResponseOptionShort %in% c("Other barrier", "None, can walk or bike")]$ResponseOptionShort
-mrg_barriers[, ResponseOptionShort := factor(ResponseOptionShort, levels = c(barriers_levels, "Other barrier", "None, can walk or bike"))]
-mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionShort, BarrierType)]
-
 # Add short labels
 barriers_short <- data.table(descr[QuestionNum==11, .(QuestionResponseOptionID, ResponseOption)],
                                ResponseOptionShort = c("Too far", "No close access", "Roads not safe",
@@ -273,6 +268,11 @@ barriers_short <- data.table(descr[QuestionNum==11, .(QuestionResponseOptionID, 
                                                   "Barrier", "Can Walk/Bike", "Exclude"))
 mrg_barriers[barriers_short, c("ResponseOptionShort","BarrierType") := .(i.ResponseOptionShort,BarrierType), on = "ResponseOption"]
 mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionShort, BarrierType)][order(-Yes)][]
+
+# order responses with not barrier at end
+barriers_levels <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), by = ResponseOptionShort][order(-Yes)][!ResponseOptionShort %in% c("Other barrier", "None, can walk or bike")]$ResponseOptionShort
+mrg_barriers[, ResponseOptionShort := factor(ResponseOptionShort, levels = c(barriers_levels, "Other barrier", "None, can walk or bike"))]
+mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionShort, BarrierType)]
 
 # 12. Do you currently use the Greenway to help you get to any of these destinations by foot or bike (check ALL that apply)?
 cols <- names(mrg)[grep("S2_P4_T0_Q1", names(mrg))]

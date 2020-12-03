@@ -1,7 +1,7 @@
 ---
 title: "Mascoma River Greenway Survey and Count Results"
 author: "UVLSRPC"
-date: "October 6, 2020"
+date: "December 1, 2020"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -42,11 +42,11 @@ valueBox(value, caption = "Surveys from City of Lebanon Residents", icon = "fa-c
 
 ### About this Document
 
-The dashboard presents analyis of the Mascoma River Greenway user survey and counts. The survey was administered to greenway users and other Upper Valley residents in June and July, 2020 by UVLSRPC. Counts at two locations on the Mascoma River Greenway were taken by UVLSRPC for two weeks in late July and early August, 2020.
+The dashboard presents results of the 2020 Mascoma River Greenway research project. A survey was administered to Greenway users and other Upper Valley residents in June and July, 2020 by Upper Valley Lake Sunapee Regional Planning Commission (UVLSRPC). Counts of trail users were performed by UVLSRPC at two locations on the Mascoma River Greenway for two weeks in late July and early August, 2020.
 
 The survey and count program were developed in collaboration with the Mascoma River Greenway coalition, City of Lebanon, Friends of Lebanon Recreation, Lebanon Pedestrian and Bicyclist Advisory Committee, Upper Valley Trails Alliance, and other groups.
 
-The purpose of the survey and counts were to collect data to understand current use of the greenway, identify any short term issues and user needs, and to support longer term planning of improvements to the greenway.
+The purpose of the survey and counts were to collect data to understand current use of the Greenway, identify short term issues and user needs, and to support longer term planning of improvements to the Greenway.
 
 Users may navigate to different areas of the dashboard using the navigation bar at the top of the page, and may interact directly with most tables, charts, and maps.
 
@@ -121,7 +121,7 @@ Respondents were asked about their frequency of use in both the warmer months of
 
 ### Recreational Use
 
-Which of the following recreational activities do you use the Greenway for? Check all that apply.
+Which of the following recreational activities do you use the Greenway for? Check all that apply./n
 
 ```{r Chart_Rec_Use}
 # Organize
@@ -288,7 +288,7 @@ fwrite(dat, file = "MRG_Destination_Barriers.csv")
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-Access Maps {data-icon="fa-map"}
+Access {data-icon="fa-map"}
 ============================================
 
 Column {data-width=300}
@@ -360,7 +360,7 @@ tm_shape(desired_barriers_shp) +
 ```
 
 
-MRG Value {data-icon="fa-dollar-sign"}
+Community Value {data-icon="fa-dollar-sign"}
 ============================================
 
 Column {data-width=400}
@@ -393,7 +393,7 @@ Column {data-width=400}
 
 ### MRG Investment Priorities
 
-Respondents to the survey were asked to allocate a notional budget to various MRG maintenance and improvement options. The largest proportion of the budget was allocated to extending the MRG to West Lebanon, recognizing both the preference amongst respodents for an extension and also the likely cost associated with that project. A close second was a shorter extension from the current western terminus of the MRG to Riverside Park.
+Respondents to the survey were given 100 “Greenway Bucks” and asked to create a balanced budget for improving and maintaining the MRG. The largest proportion of the budget was allocated to extending the MRG to West Lebanon, recognizing both the preference among respondents for an extension and also the likely cost associated with that project. A close second was a shorter extension from the current western terminus of the MRG to Riverside Park.
 
 ### Budget
 
