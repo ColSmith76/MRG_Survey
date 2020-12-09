@@ -121,8 +121,6 @@ Respondents were asked about their frequency of use in both the warmer months of
 
 ### Recreational Use
 
-Which of the following recreational activities do you use the Greenway for? Check all that apply./n
-
 ```{r Chart_Rec_Use}
 # Organize
 dat <- mrg_rec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption, UserType)]
@@ -134,9 +132,9 @@ fwrite(dat, file = "Rec_Use.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Recreational Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
 ```
 
-### Non-Recreational Use
+> Which of the following recreational activities do you use the Greenway for? Check all that apply.
 
-Which of the following non-recreational activities do you use the Greenway for? Check all that apply.
+### Non-Recreational Use
 
 ```{r Chart_Trans_Use}
 # Organize
@@ -149,11 +147,9 @@ fwrite(dat, file = "Trans_Use.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatonal Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
 ```
 
+> Which of the following non-recreational activities do you use the Greenway for? Check all that apply.
+
 ### Frequency by Season
-
-In the warmer months, about how often do you use the Greenway?
-
-In the winter, about how often do you use the Greenway?
 
 ```{r Chart_Freq}
 # Organize
@@ -165,6 +161,9 @@ fwrite(dat, file = "Freq_Warmer_Months_And_Winter.csv")
 # Plot
 bar_plotter(dat, xvar = "Frequency", yvar = "N", ylabel = "Respondents", fill = "Season", position = "dodge", xrotate = TRUE)
 ```
+
+> In the warmer months, about how often do you use the Greenway?
+> In the winter, about how often do you use the Greenway?
 
 Experience {data-icon="fa-user"}
 ============================================
@@ -178,8 +177,6 @@ Most respondents reported postive experiences when using the MRG, with the most 
 
 ### Overall Experience
 
-Please select the options below that describe your experience using the Greenway
-
 ```{r Chart_Experience}
 # Organize
 dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ExperienceType, ResponseOptionShort)][order(-Yes)]
@@ -192,9 +189,9 @@ fwrite(dat, file = "MRG_Experience.csv")
 bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "ExperienceType", xlabel = "Experience", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-### Specific Experiences
+> Please select the options below that describe your experience using the Greenway
 
-Please describe any specific experiences or thoughts about the Greenway that you wish to share
+### Specific Experiences
 
 ```{r Chart_Experience_Specific}
 # Organize
@@ -208,6 +205,7 @@ fwrite(dat, file = "MRG_Experience_Qual.csv")
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Experience or Suggestion", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
+> Please describe any specific experiences or thoughts about the Greenway that you wish to share
 
 Column {data-width=333}
 --------------------------------------------
@@ -220,8 +218,6 @@ Respondents reported distance as the main barrier to walking or driving to the M
 
 ### Travel to the MRG
 
-How do you usually travel to the Greenway from your home?
-
 ```{r Chart_Travel_Mode}
 # Organize
 dat <- mrg[,.N, keyby = .(Mode = S2_P3_T0_Q1_Getting_to_the_Greenway_1, LebRes)]
@@ -233,9 +229,9 @@ fwrite(dat, file = "MRG_Travel_Mode.csv")
 bar_plotter(dat, xvar = "Mode", yvar = "N", ylabel = "Respondents", fill = "LebRes", position = "dodge", xrotate = TRUE)
 ```
 
-### Barriers to Walk/Bike Access
+> How do you usually travel to the Greenway from your home?
 
-What are the top TWO barriers that might discourage you from walking or bicycling to the Greenway from your home?
+### Barriers to Walk/Bike Access
 
 ```{r Chart_Barriers}
 # Organize
@@ -248,6 +244,8 @@ fwrite(dat, file = "MRG_Barriers.csv")
 bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "BarrierType", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
+> What are the top TWO barriers that might discourage you from walking or bicycling to the Greenway from your home?
+
 Column {data-width=333}
 --------------------------------------------
 
@@ -258,8 +256,6 @@ While many respondents report staying on the MRG, a significant number used the 
 The most frequently reported barrier to reaching destinations was the lack of a connection to West Lebanon and the poor safety of Glen Road, the Miracle Mile, and the intersection at High Street and Mascoma Street.
 
 ### Destinations Visited
-
-Do you currently use the Greenway to help you get to any of these destinations by foot or bike (check ALL that apply)?
 
 ```{r Chart_Destinations}
 # Organize
@@ -272,9 +268,9 @@ fwrite(dat, file = "MRG_Destinations.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", fill = "DestType", xlabel = "Destination", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-### Destination Barriers
+> Do you currently use the Greenway to help you get to any of these destinations by foot or bike (check ALL that apply)?
 
-Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.
+### Destination Barriers
 
 ```{r Chart_Destination_Barriers}
 # Organize
@@ -287,6 +283,8 @@ fwrite(dat, file = "MRG_Destination_Barriers.csv")
 # Plot
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
+
+> Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.
 
 Access {data-icon="fa-map"}
 ============================================
@@ -374,8 +372,6 @@ Value is placed on it being flat, paved and smooth, and that is provides a recre
 
 ### Community Resource Values
 
-Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below
-
 ```{r Chart_Resource}
 # Organize
 dat <- mrg_comm_val[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)]
@@ -387,6 +383,8 @@ fwrite(dat, file = "MRG_Resource.csv")
 # Plot
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Value", ylabel = "Respondents", coord_flip = TRUE)
 ```
+
+> Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below
 
 Column {data-width=400}
 --------------------------------------------
@@ -452,6 +450,9 @@ value <- format(max(count_mrg[,.(Count = round(sum(UsersEst)/.N)),
 valueBox(value, caption = "Highest hourly count", icon = "fa-check")
 ```
 
+Column {data-width=400}
+--------------------------------------------
+
 ### MRG Count Methodology
 
 UVLSRPC recorded counts at two locations on the Mascoma River Greenway in late July and early August, 2020. The count period lasted for 19 days between July 25th and August 12th and included 6 weekend days and 13 weekdays. The two locations were "East of I-89", between the MRG parking lot at Slayton Hill and the bridge over I-89, and just to the west of the access from the "Price Chopper" parking lot on the Miracle Mile.
@@ -460,14 +461,11 @@ The counts are presented in terms of number of unique MRG users. Since most user
 
 The calibration count also recorded a split between walkers/runners and cyclists of 60% on foot, 34% cycling, with 6% other (all rollerbladers except for one municipal employee on an ATV)
 
-Column {data-width=400}
---------------------------------------------
-
 ### Daily Counts
 
 The daily charts below show that, on an average day, about 240 people use the section of the MRG east of I-89 and about 150 people use the section close to the Price Chopper access. The number of daily users does not vary between weekdays and weekends. The section east of I-89 may be busier as it closer to the more densely populated residential areas around downtown Lebanon and there are more formal access points and trailhead parking lots. 
 
-### Daily Count: East of I-89
+#### Daily Count: East of I-89
 
 ```{r Chart_Count_Daily_East_I89}
 # Organize
@@ -482,7 +480,7 @@ fwrite(dat, file = "MRG_Count_Daily_East_of_I89.csv")
 bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
 ```
 
-### Daily Count: Price Chopper
+#### Daily Count: Price Chopper
 
 ```{r Chart_Count_Daily_PC}
 # Organize
@@ -500,11 +498,49 @@ bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "D
 Column {data-width=400}
 --------------------------------------------
 
+### Hourly Profiles
+
+The two charts below show the average hourly counts at the two locations, split between weekdays in blue and weekend days in green. While the daily use is consistent between weekdays and weekends, the times of day that see peak trail use vary between weekdays and weekends. 
+
+Trail use builds quickly early on weekday mornings, with high levels of use in the early morning hours from 6am to 8am and then contuining at that level until 11am. Lunchtime and early afternoon sees a decline in use, with a second higher peak in the late afternoon and early evening from 4pm until 7pm.
+
+Things take a bit longer to get going on weekends with the 5am to 7am hours being much quieter than weekdays. Later in the morning is similar to weekdays and then there is a peak at 11am and a second bump in use after lunch, from 1pm to 3pm. Evening use is slightly lower than the afternoon and lower than evening use on weekdays.
+
+#### Hourly Count: East of I-89
+
+```{r Chart_Count_Hourly_East_I89}
+# Organize
+dat <- count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst)/.N)), 
+             keyby = .(Hour, Weekend)]
+dat[, HourFac := factor(Hour)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Hourly_East_of_I89.csv")
+
+# Plot
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
+```
+
+#### Hourly Count: Price Chopper
+
+```{r Chart_Count_Hourly_PC}
+# Organize
+dat <- count_mrg[Location == "Price Chopper",.(Count = round(sum(UsersEst)/.N)), 
+             keyby = .(Hour, Weekend)]
+dat[, HourFac := factor(Hour)]
+
+# Save
+fwrite(dat, file = "MRG_Count_Hourly_Price_Chopper.csv")
+
+# Plot
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
+```
+
 ### Impact of High Temperatures and Rain
 
 While the count period had generally consistently dry and warm summer weather, there were some weather events that reduced trail use. On Tuesday August 4th, Tropical Storm Isaias passed through NH and Lebanon saw 1.4 inches of rain, and that day had only around 30 percent of the typical number of users. There was measurable rain (a tenth of an inch or more) on three other days (the four days marked in blue on the chart below were wet). Two days saw excessive heat, with high temperatures of 93F and 94F respectively (these two days are marked in red on the chart below). The second chart below shows that there is some correlation between the daily high temperature and the amount of trail use, with a decline in use as the temperature increases. The range of daily high temperatures in the count period was 78F to 94F.
 
-### Daily Weather
+#### Counts by Daily Temperature and Rainfall
 
 ```{r Chart_Count_Daily_Weather}
 # Organize
@@ -524,7 +560,7 @@ bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weather", xlabel = "D
 
 ```
 
-### Daily Max Temperature
+#### Counts and Daily Max Temperature
 
 ```{r Chart_Count_Daily_Max_Temp}
 # Organize
@@ -543,49 +579,10 @@ p <- ggplot(data=dat[Precip == 0], aes(y = Count, x = Temperature, color = Locat
   scale_y_continuous(labels = scales::comma_format()) +
   scale_x_continuous(labels = scales::comma_format()) +
   scale_color_manual(values = rgb(mrgcolordf[2:3,],maxColorValue = 255)) +
-  theme_db
-ggplotly(p)
+  theme_db + theme(legend.position = "bottom")
+#ggplotly(p)
+p
 
 
 ```
 
-Column {data-width=500}
---------------------------------------------
-
-### Hourly Profiles
-
-The two charts below show the average hourly counts at the two locations, split between weekdays in blue and weekend days in green. While the daily use is consistent between weekdays and weekends, the times of day that see peak trail use vary between weekdays and weekends. 
-
-Trail use builds quickly early on weekday mornings, with high levels of use in the early morning hours from 6am to 8am and then contuining at that level until 11am. Lunchtime and early afternoon sees a decline in use, with a second higher peak in the late afternoon and early evening from 4pm until 7pm.
-
-Things take a bit longer to get going on weekends with the 5am to 7am hours being much quieter than weekdays. Later in the morning is similar to weekdays and then there is a peak at 11am and a second bump in use after lunch, from 1pm to 3pm. Evening use is slightly lower than the afternoon and lower than evening use on weekdays.
-
-### Hourly Count: East of I-89
-
-```{r Chart_Count_Hourly_East_I89}
-# Organize
-dat <- count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst)/.N)), 
-             keyby = .(Hour, Weekend)]
-dat[, HourFac := factor(Hour)]
-
-# Save
-fwrite(dat, file = "MRG_Count_Hourly_East_of_I89.csv")
-
-# Plot
-bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
-```
-
-### Hourly Count: Price Chopper
-
-```{r Chart_Count_Hourly_PC}
-# Organize
-dat <- count_mrg[Location == "Price Chopper",.(Count = round(sum(UsersEst)/.N)), 
-             keyby = .(Hour, Weekend)]
-dat[, HourFac := factor(Hour)]
-
-# Save
-fwrite(dat, file = "MRG_Count_Hourly_Price_Chopper.csv")
-
-# Plot
-bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
-```

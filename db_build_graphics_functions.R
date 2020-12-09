@@ -259,6 +259,7 @@ bar_plotter <- function(data, xvar, yvar,
     p <- p + labs(fill = "")
   }
   if (useplotly){
+    #config(plot_ly(), displayModeBar = FALSE)
     p <- plotly_build(p)
   
     p[["data"]] <- lapply(p[["data"]], function(x) {
