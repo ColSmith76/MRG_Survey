@@ -10,4 +10,4 @@ The purpose of the survey was to collect to data to understand current use of th
 Links to Resources
 ======================================================================
 
-- Survey results analysis: https://colsmith76.github.io/MRG_Survey/MRG_Survey_Results.html
+- Survey results analysis: https://colsmith76.github.io/MRG_Survey/MRG_Survey_And_Count_Results.html
