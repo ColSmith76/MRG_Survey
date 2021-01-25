@@ -48,6 +48,8 @@ The survey and count program were developed in collaboration with the Mascoma Ri
 
 The purpose of the survey and counts were to collect data to understand current use of the Greenway, identify short term issues and user needs, and to support longer term planning of improvements to the Greenway.
 
+### Navigation and Browser Versions
+
 Users may navigate to different areas of the dashboard using the navigation bar at the top of the page, and may interact directly with most tables, charts, and maps.
 
 This document is best viewed using the most recent versions of the following web browsers:
@@ -66,9 +68,9 @@ The majority of respondents who completed the survey were from Lebanon, with abo
 
 The proportion of survey respondents by age peaked in the 41 to 60 age bracket. There were relatively few responses from younger MRG users (under 25); the survey asked about the age of the respondent and did not include questions about the age of those accompanying the respondents on their trips on the MRG, so we don't have information about, for example, the number of children using the MRG.
 
-The household income of survey respondents was relatively high on average, with about a third of respondents resporting that they live in households with an annual income of over $100,000. 
+The household income of survey respondents was relatively high, with about a third of respondents resporting that they live in households with an annual income of over $100,000. 
 
-### Respondents by Home Location
+### Respondents by Home Location<br><i>What is your ZIP code?</i>
 
 ```{r Chart_Resp_by_Home}
 # Organize
@@ -81,7 +83,7 @@ fwrite(dat, file = "Resp_by_Home.csv")
 bar_plotter(dat, xvar = "Muni_State", yvar = "N", xlabel = "Home Municipality", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-### Respondents by Age
+### Respondents by Age<br><i>What is your age?</i>
 
 ```{r Chart_Resp_by_Age}
 # Organize
@@ -94,7 +96,7 @@ fwrite(dat, file = "Resp_by_Age.csv")
 bar_plotter(dat, xvar = "Age", yvar = "N", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-### Respondents by Household Income
+### Respondents by Household Income<br><i>What is your annual household income?</i>
 
 ```{r Chart_Resp_by_Income}
 # Organize
@@ -114,12 +116,11 @@ Column {data-width=400}
 
 Most respondents reported using the MRG for recreation, with lower intensity recreation (walking and leisurely paced cycling) the most common uses. More intensive recreation on foot (running) and bikes was also commonly reported. Smaller number of users reported winter sports uses and alternative warmers months users such as rollerblading. 
 
-About two thirds of respondents only ever use MRG recreation. Amongst non-recreational uses, running errands was the most common response, closely followed by commuting to work or school.
+About two thirds of respondents only ever use the MRG for recreation. Amongst non-recreational uses, running errands was the most common response, closely followed by commuting to work or school.
 
 Respondents were asked about their frequency of use in both the warmer months of the year and in winter. Amongst the survey respondents, about half used the MRG either weekly or a few times a week. Winter use is much less frequent, with over a third of respondents never using the MRG in winter and the most common response being "about once a month".
 
-
-### Recreational Use
+### Recreational Use<br><i>Which of the following recreational activities do you use the Greenway for? Check all that apply.</i>
 
 ```{r Chart_Rec_Use}
 # Organize
@@ -132,9 +133,7 @@ fwrite(dat, file = "Rec_Use.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Recreational Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
 ```
 
-> Which of the following recreational activities do you use the Greenway for? Check all that apply.
-
-### Non-Recreational Use
+### Non-Recreational Use<br><i>Which of the following non-recreational activities do you use the Greenway for? Check all that apply.</i>
 
 ```{r Chart_Trans_Use}
 # Organize
@@ -147,9 +146,7 @@ fwrite(dat, file = "Trans_Use.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatonal Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
 ```
 
-> Which of the following non-recreational activities do you use the Greenway for? Check all that apply.
-
-### Frequency by Season
+### Frequency by Season<br><i>In the warmer months, about how often do you use the Greenway?<br>In the winter, about how often do you use the Greenway?</i>
 
 ```{r Chart_Freq}
 # Organize
@@ -162,9 +159,6 @@ fwrite(dat, file = "Freq_Warmer_Months_And_Winter.csv")
 bar_plotter(dat, xvar = "Frequency", yvar = "N", ylabel = "Respondents", fill = "Season", position = "dodge", xrotate = TRUE)
 ```
 
-> In the warmer months, about how often do you use the Greenway?
-> In the winter, about how often do you use the Greenway?
-
 Experience {data-icon="fa-user"}
 ============================================
 
@@ -175,7 +169,7 @@ Column {data-width=333}
 
 Most respondents reported postive experiences when using the MRG, with the most common negative experience being due to a lack of signage and rules. A small number of respondents reported collisions or near misses with bicyclists or other conflicts. The most common request made in the written responses to the specific experience question was to add signs with safety instructions and rules. The most common conflicts or issues were with bicyclists and dogs.
 
-### Overall Experience
+### Overall Experience<br><i>Please select the options below that describe your experience using the Greenway</i>
 
 ```{r Chart_Experience}
 # Organize
@@ -189,9 +183,7 @@ fwrite(dat, file = "MRG_Experience.csv")
 bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "ExperienceType", xlabel = "Experience", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-> Please select the options below that describe your experience using the Greenway
-
-### Specific Experiences
+### Specific Experiences<br><i>Please describe any specific experiences or thoughts about the Greenway that you wish to share</i>
 
 ```{r Chart_Experience_Specific}
 # Organize
@@ -205,8 +197,6 @@ fwrite(dat, file = "MRG_Experience_Qual.csv")
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Experience or Suggestion", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-> Please describe any specific experiences or thoughts about the Greenway that you wish to share
-
 Column {data-width=333}
 --------------------------------------------
 
@@ -216,7 +206,7 @@ Most respondents drove in their car to the MRG, but amongst Lebanon residents, t
 
 Respondents reported distance as the main barrier to walking or driving to the MRG, followed by unsafe roads. 
 
-### Travel to the MRG
+### Travel to the MRG<br><i>How do you usually travel to the Greenway from your home?</i>
 
 ```{r Chart_Travel_Mode}
 # Organize
@@ -229,9 +219,7 @@ fwrite(dat, file = "MRG_Travel_Mode.csv")
 bar_plotter(dat, xvar = "Mode", yvar = "N", ylabel = "Respondents", fill = "LebRes", position = "dodge", xrotate = TRUE)
 ```
 
-> How do you usually travel to the Greenway from your home?
-
-### Barriers to Walk/Bike Access
+### Barriers to Walk/Bike Access<br><i>What are the top TWO barriers that might discourage you from walking or bicycling to the Greenway from your home?</i>
 
 ```{r Chart_Barriers}
 # Organize
@@ -244,8 +232,6 @@ fwrite(dat, file = "MRG_Barriers.csv")
 bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "BarrierType", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-> What are the top TWO barriers that might discourage you from walking or bicycling to the Greenway from your home?
-
 Column {data-width=333}
 --------------------------------------------
 
@@ -255,7 +241,7 @@ While many respondents report staying on the MRG, a significant number used the 
 
 The most frequently reported barrier to reaching destinations was the lack of a connection to West Lebanon and the poor safety of Glen Road, the Miracle Mile, and the intersection at High Street and Mascoma Street.
 
-### Destinations Visited
+### Destinations Visited<br><i>Do you currently use the Greenway to help you get to any of these destinations by foot or bike (check ALL that apply)?</i>
 
 ```{r Chart_Destinations}
 # Organize
@@ -268,9 +254,7 @@ fwrite(dat, file = "MRG_Destinations.csv")
 bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", fill = "DestType", xlabel = "Destination", ylabel = "Respondents", coord_flip = TRUE)
 ```
 
-> Do you currently use the Greenway to help you get to any of these destinations by foot or bike (check ALL that apply)?
-
-### Destination Barriers
+### Destination Barriers<br><i>Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.</i>
 
 ```{r Chart_Destination_Barriers}
 # Organize
@@ -283,8 +267,6 @@ fwrite(dat, file = "MRG_Destination_Barriers.csv")
 # Plot
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
 ```
-
-> Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.
 
 Access {data-icon="fa-map"}
 ============================================
@@ -357,7 +339,6 @@ tm_shape(desired_barriers_shp) +
   
 ```
 
-
 Community Value {data-icon="fa-dollar-sign"}
 ============================================
 
@@ -370,7 +351,7 @@ Respondents to the survey most strongly value the MRG as a safe, car free locati
 
 Value is placed on it being flat, paved and smooth, and that is provides a recreation location for residents with limited mobility.
 
-### Community Resource Values
+### Community Resource Values<br><i>Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below.</i>
 
 ```{r Chart_Resource}
 # Organize
@@ -383,8 +364,6 @@ fwrite(dat, file = "MRG_Resource.csv")
 # Plot
 bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Value", ylabel = "Respondents", coord_flip = TRUE)
 ```
-
-> Do you think the Mascoma River Greenway is a valuable community resource? Why or why not? Please explain below
 
 Column {data-width=400}
 --------------------------------------------
