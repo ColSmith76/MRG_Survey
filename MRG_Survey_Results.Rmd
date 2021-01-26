@@ -1,7 +1,7 @@
 ---
 title: "Mascoma River Greenway Survey and Count Results"
 author: "UVLSRPC"
-date: "December 1, 2020"
+date: "January 26, 2020"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -30,14 +30,15 @@ Summary {data-width=200}
 
 ```{r}
 value <- format(mrg[, .N], big.mark = ",", trim = TRUE)
-valueBox(value, caption = "Number of Completed Surveys", icon = "fa-check")
+valueBox(value, caption = "Number of Survey Respondents", icon = "fa-check")
 ```
 
-### Number of Respondents from Lebanon
+### Daily MRG Users
 
 ```{r}
-value <- format(mrg[Muni_State %in% c("WEST LEBANON, NH", "LEBANON, NH"), .N], big.mark = ",", trim = TRUE)
-valueBox(value, caption = "Surveys from City of Lebanon Residents", icon = "fa-check")
+value <- format(round(mean(count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst))), 
+          keyby = .(Date)]$Count)), big.mark = ",", trim = TRUE)
+valueBox(value, caption = "Daily MRG users (East of I-89) ", icon = "fa-check")
 ```
 
 ### About this Document
@@ -75,39 +76,48 @@ The household income of survey respondents was relatively high, with about a thi
 ```{r Chart_Resp_by_Home}
 # Organize
 dat <- mrg[, .N, by = Muni_State]
+dat[Muni_State != "NA, NA", Pct := N/sum(N)]
 
 # Save
 fwrite(dat, file = "Resp_by_Home.csv")
 
 # Plot
-bar_plotter(dat, xvar = "Muni_State", yvar = "N", xlabel = "Home Municipality", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "Muni_State", yvar = "Pct", xlabel = "Home Municipality", ylabel = "Percentage of Respondents", coord_flip = TRUE)
 ```
+
+> Question answered by `r dat[!is.na(Pct),sum(N)]` of `r mrg[, .N]` respondents.
 
 ### Respondents by Age<br><i>What is your age?</i>
 
 ```{r Chart_Resp_by_Age}
 # Organize
 dat <- mrg[,.N, keyby = .(Age = Q_StandardAge)]
+dat[!is.na(Age), Pct := N/sum(N)]
 
 # Save
 fwrite(dat, file = "Resp_by_Age.csv")
 
 # Plot
-bar_plotter(dat, xvar = "Age", yvar = "N", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "Age", yvar = "Pct", ylabel = "Percentage of Respondents", coord_flip = TRUE)
 ```
+
+> Question answered by `r dat[!is.na(Pct),sum(N)]` of `r mrg[, .N]` respondents.
 
 ### Respondents by Household Income<br><i>What is your annual household income?</i>
 
 ```{r Chart_Resp_by_Income}
 # Organize
 dat <- mrg[, .N, keyby = .(Income = XIT_Custom3)]
+dat[Income != "Prefer not to say", Pct := N/sum(N)]
 
 # Save
 fwrite(dat, file = "Resp_by_Income.csv")
 
 # Plot
-bar_plotter(dat, xvar = "Income", yvar = "N", xlabel = "Household Income", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "Income", yvar = "Pct", xlabel = "Household Income", ylabel = "Percentage of Respondents", coord_flip = TRUE)
 ```
+
+> An income value was reported by `r dat[!is.na(Pct),sum(N)]` of `r mrg[, .N]` respondents; the remainder either selected prefer not to say or did not answer.
 
 Column {data-width=400}
 --------------------------------------------
@@ -130,7 +140,7 @@ dat <- mrg_rec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption, U
 fwrite(dat, file = "Rec_Use.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Recreational Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Recreational Use", ylabel = "Number of Responses", fill = "UserType", legend_name = "MRG User Type", coord_flip = TRUE)
 ```
 
 ### Non-Recreational Use<br><i>Which of the following non-recreational activities do you use the Greenway for? Check all that apply.</i>
@@ -143,7 +153,7 @@ dat <- mrg_nonrec_use[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption
 fwrite(dat, file = "Trans_Use.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatonal Use", ylabel = "Respondents", fill = "UserType", coord_flip = TRUE)
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatonal Use", ylabel = "Number of Responses", fill = "UserType", legend_name = "MRG User Type", coord_flip = TRUE)
 ```
 
 ### Frequency by Season<br><i>In the warmer months, about how often do you use the Greenway?<br>In the winter, about how often do you use the Greenway?</i>
@@ -152,55 +162,24 @@ bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", xlabel = "Non-Recreatona
 # Organize
 dat <- rbind(mrg[,.N, keyby = .(Frequency = S2_P1_T0_Q1_Seasonal_Use_1)][, Season := "Warmer Months"],
              mrg[,.N, keyby = .(Frequency = S2_P1_T0_Q2_Seasonal_Use_2)][, Season := "Winter"])
+dat[!is.na(Frequency), Pct := N/sum(N), by = Season]
+
 # Save
 fwrite(dat, file = "Freq_Warmer_Months_And_Winter.csv")
 
 # Plot
-bar_plotter(dat, xvar = "Frequency", yvar = "N", ylabel = "Respondents", fill = "Season", position = "dodge", xrotate = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "Frequency", yvar = "Pct", ylabel = "Percentage of Respondents", fill = "Season", position = "dodge", xrotate = TRUE)
 ```
 
-Experience {data-icon="fa-user"}
+> Question answered by `r dat[!is.na(Pct) & Season == "Warmer Months",sum(N)]` of `r mrg[, .N]` respondents.
+
+Travel and Destinations {data-icon="fa-arrow-circle-right"}
 ============================================
 
-Column {data-width=333}
+Column {data-width=400}
 --------------------------------------------
 
-### Experience
-
-Most respondents reported postive experiences when using the MRG, with the most common negative experience being due to a lack of signage and rules. A small number of respondents reported collisions or near misses with bicyclists or other conflicts. The most common request made in the written responses to the specific experience question was to add signs with safety instructions and rules. The most common conflicts or issues were with bicyclists and dogs.
-
-### Overall Experience<br><i>Please select the options below that describe your experience using the Greenway</i>
-
-```{r Chart_Experience}
-# Organize
-dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ExperienceType, ResponseOptionShort)][order(-Yes)]
-dat[, ResponseOptionShort := factor(ResponseOptionShort, levels = dat$ResponseOptionShort)]
-
-# Save
-fwrite(dat, file = "MRG_Experience.csv")
-
-# Plot
-bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "ExperienceType", xlabel = "Experience", ylabel = "Respondents", coord_flip = TRUE)
-```
-
-### Specific Experiences<br><i>Please describe any specific experiences or thoughts about the Greenway that you wish to share</i>
-
-```{r Chart_Experience_Specific}
-# Organize
-dat <- mrg_exp_qual[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)]
-dat[, CodedResponse := factor(CodedResponse, levels = dat$CodedResponse)]
-
-# Save
-fwrite(dat, file = "MRG_Experience_Qual.csv")
-
-# Plot
-bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Experience or Suggestion", ylabel = "Respondents", coord_flip = TRUE)
-```
-
-Column {data-width=333}
---------------------------------------------
-
-### Access to the MRG
+### Travel to the MRG
 
 Most respondents drove in their car to the MRG, but amongst Lebanon residents, there was more non-motorized access (walking or biking) than driving.
 
@@ -211,13 +190,17 @@ Respondents reported distance as the main barrier to walking or driving to the M
 ```{r Chart_Travel_Mode}
 # Organize
 dat <- mrg[,.N, keyby = .(Mode = S2_P3_T0_Q1_Getting_to_the_Greenway_1, LebRes)]
+dat[Mode != "Not Answered", Pct := N/sum(N), by = LebRes]
 
 # Save
 fwrite(dat, file = "MRG_Travel_Mode.csv")
 
 # Plot
-bar_plotter(dat, xvar = "Mode", yvar = "N", ylabel = "Respondents", fill = "LebRes", position = "dodge", xrotate = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "Mode", yvar = "Pct", ylabel = "Percentage of Respondents", 
+            fill = "LebRes", position = "dodge", legend_name = "Residence Location", xrotate = TRUE)
 ```
+
+> Question answered by `r dat[!is.na(Pct),sum(N)]` of `r mrg[, .N]` respondents.
 
 ### Barriers to Walk/Bike Access<br><i>What are the top TWO barriers that might discourage you from walking or bicycling to the Greenway from your home?</i>
 
@@ -229,10 +212,10 @@ dat <- mrg_barriers[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOptionSh
 fwrite(dat, file = "MRG_Barriers.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "BarrierType", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "BarrierType", xlabel = "Barrier", ylabel = "Number of Responses", legend_name = "Barrier Type", coord_flip = TRUE)
 ```
 
-Column {data-width=333}
+Column {data-width=400}
 --------------------------------------------
 
 ### Destinations
@@ -251,7 +234,7 @@ dat <- mrg_dest[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ResponseOption, Dest
 fwrite(dat, file = "MRG_Destinations.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", fill = "DestType", xlabel = "Destination", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "ResponseOption", yvar = "Yes", fill = "DestType", xlabel = "Destination", ylabel = "Number of Responses", legend_name = "Destination Type", coord_flip = TRUE)
 ```
 
 ### Destination Barriers<br><i>Are there any barriers or safety issues that discourage you from using the Greenway to get to local destinations by foot or bike? Please describe below.</i>
@@ -265,7 +248,7 @@ dat[, CodedResponse := factor(CodedResponse, levels = dat$CodedResponse)]
 fwrite(dat, file = "MRG_Destination_Barriers.csv")
 
 # Plot
-bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Barrier", ylabel = "Number of Responses", coord_flip = TRUE)
 ```
 
 Access {data-icon="fa-map"}
@@ -291,7 +274,7 @@ dat[, name := factor(name, levels = dat$name)]
 fwrite(dat, file = "MRG_Current_Access.csv")
 
 # Plot
-bar_plotter(dat, xvar = "name", yvar = "Respondents", fill = "AccessType", xlabel = "Acccess", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "name", yvar = "Respondents", fill = "AccessType", xlabel = "Acccess", ylabel = "Number of Responses", legend_name = "Access Ownership", coord_flip = TRUE)
 ```
 
 ### Desired Access Locations
@@ -305,7 +288,7 @@ dat[, name := factor(name, levels = dat$name)]
 fwrite(dat, file = "MRG_Desired_Access.csv")
 
 # Plot
-bar_plotter(dat, xvar = "name", yvar = "Respondents", xlabel = "Acccess", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "name", yvar = "Respondents", xlabel = "Acccess", ylabel = "Number of Responses", coord_flip = TRUE)
 ```
 
 Column {data-width=700}
@@ -339,6 +322,48 @@ tm_shape(desired_barriers_shp) +
   
 ```
 
+Experience {data-icon="fa-user"}
+============================================
+
+Column {data-width=400}
+--------------------------------------------
+
+### Experience
+
+Most respondents reported positive experiences when using the MRG, with the most common negative experience being due to a lack of signage and rules. A small number of respondents reported collisions or near misses with bicyclists or other conflicts. The most common request made in the written responses to the specific experience question was to add signs with safety instructions and rules. The most common conflicts or issues were with bicyclists and dogs.
+
+### Overall Experience<br><i>Please select the options below that describe your experience using the Greenway</i>
+
+```{r Chart_Experience}
+# Organize
+dat <- mrg_experience[,.(Yes = sum(Yes, na.rm = TRUE)), keyby = .(ExperienceType, ResponseOptionShort)][order(-Yes)]
+dat[, ResponseOptionShort := factor(ResponseOptionShort, levels = dat$ResponseOptionShort)]
+
+# Save
+fwrite(dat, file = "MRG_Experience.csv")
+
+# Plot
+bar_plotter(dat, xvar = "ResponseOptionShort", yvar = "Yes", fill = "ExperienceType", xlabel = "Experience", ylabel = "Number of Responses", legend_name = "MRG Experience" , coord_flip = TRUE)
+```
+
+Column {data-width=400}
+--------------------------------------------
+
+### Specific Experiences<br><i>Please describe any specific experiences or thoughts about the Greenway that you wish to share</i>
+
+```{r Chart_Experience_Specific}
+# Organize
+dat <- mrg_exp_qual[!is.na(Code),.(Yes = .N), keyby = CodedResponse][order(-Yes)]
+dat[, CodedResponse := factor(CodedResponse, levels = dat$CodedResponse)]
+
+# Save
+fwrite(dat, file = "MRG_Experience_Qual.csv")
+
+# Plot
+bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Experience or Suggestion", ylabel = "Number of Responses", coord_flip = TRUE)
+```
+
+
 Community Value {data-icon="fa-dollar-sign"}
 ============================================
 
@@ -362,7 +387,7 @@ dat[, CodedResponse := factor(CodedResponse, levels = dat$CodedResponse)]
 fwrite(dat, file = "MRG_Resource.csv")
 
 # Plot
-bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Value", ylabel = "Respondents", coord_flip = TRUE)
+bar_plotter(dat, xvar = "CodedResponse", yvar = "Yes", xlabel = "Value", ylabel = "Number of Responses", coord_flip = TRUE)
 ```
 
 Column {data-width=400}
@@ -377,12 +402,13 @@ Respondents to the survey were given 100 “Greenway Bucks” and asked to creat
 ```{r Chart_Budget}
 # Organize
 dat <- mrg_budget[,.(Amount = sum(Amount, na.rm = TRUE)), keyby = ResponseOption]
+dat[ResponseOption != "Unallocated budget", Pct := Amount/sum(Amount)]
 
 # Save
 fwrite(dat, file = "MRG_Budget.csv")
 
 # Plot
-bar_plotter(dat, xvar = "ResponseOption", yvar = "Amount", xlabel = "Budget Item", coord_flip = TRUE)
+bar_plotter(dat[!is.na(Pct)], xvar = "ResponseOption", yvar = "Pct", xlabel = "Budget Item", ylabel = "Percentage of Budget Allocation", coord_flip = TRUE)
 ```
 
 Counts {data-icon="fa-line-chart"}
@@ -456,7 +482,7 @@ dat[, DateFac := factor(Date)]
 fwrite(dat, file = "MRG_Count_Daily_East_of_I89.csv")
 
 # Plot
-bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
+bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", legend_name = "Weekday or Weekend", xrotate = TRUE)
 ```
 
 #### Daily Count: Price Chopper
@@ -471,7 +497,7 @@ dat[, DateFac := factor(Date)]
 fwrite(dat, file = "MRG_Count_Daily_Price_Chopper.csv")
 
 # Plot
-bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", xrotate = TRUE)
+bar_plotter(dat, xvar = "DateFac", yvar = "Count", fill = "Weekend", xlabel = "Date", ylabel = "Count", legend_name = "Weekday or Weekend", xrotate = TRUE)
 ```
 
 Column {data-width=400}
@@ -497,7 +523,7 @@ dat[, HourFac := factor(Hour)]
 fwrite(dat, file = "MRG_Count_Hourly_East_of_I89.csv")
 
 # Plot
-bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count", legend_name = "Weekday or Weekend")
 ```
 
 #### Hourly Count: Price Chopper
@@ -512,7 +538,7 @@ dat[, HourFac := factor(Hour)]
 fwrite(dat, file = "MRG_Count_Hourly_Price_Chopper.csv")
 
 # Plot
-bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count")
+bar_plotter(dat, xvar = "HourFac", yvar = "Count", fill = "Weekend", position = "dodge", xlabel = "Hour", ylabel = "Count", legend_name = "Weekday or Weekend")
 ```
 
 ### Impact of High Temperatures and Rain
@@ -564,4 +590,3 @@ p
 
 
 ```
-

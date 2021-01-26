@@ -226,6 +226,7 @@ bar_plotter <- function(data, xvar, yvar,
                         coord_flip = FALSE, 
                         legend_label = TRUE,
                         legend_position = "bottom",
+                        legend_name = fill,
                         useplotly = FALSE) {
   
   if (fill == "") {
@@ -235,8 +236,8 @@ bar_plotter <- function(data, xvar, yvar,
     fill_levels <- uniqueN(data[,get(fill)])
     p <- ggplot(data, aes_q(x = quote(get(xvar)), y = quote(get(yvar)), fill = quote(get(fill)))) +
       geom_bar(stat = "identity", position = position) +
-      labs(fill = fill) + 
-      scale_fill_manual(values = rgb(mrgcolordf[2:(fill_levels+1),],maxColorValue = 255)) 
+      #labs(fill = fill) + 
+      scale_fill_manual(name = legend_name, values = rgb(mrgcolordf[2:(fill_levels+1),],maxColorValue = 255)) 
   }
   p <- p + xlab(xlabel) + ylab(ylabel) +
     theme_db

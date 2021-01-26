@@ -100,7 +100,7 @@ mrg_all[, .N, by = Complete_Income]
 # require age, municipality for completeness, 
 # for not-answered income, recode as prefer not to answer
 mrg_all[, Complete := ifelse(!is.na(Q_StandardAge) & !is.na(Municipality),1,0)]
-mrg <- mrg_all[Complete == 1]
+# mrg <- mrg_all[Complete == 1]
 
 ### Convert fields to factors where appropriate
 # Age
@@ -144,12 +144,13 @@ mrg[,.N, keyby = Q_StandardAge]
 # group non local/smaller numbers into other within NH, VT and other state, with those ordered at the end
 mrg[, Num_Muncipality := .N, by = .(Municipality, State)]
 mrg[, Muni_State := paste(Municipality, State, sep = ", ")]
-mrg[Num_Muncipality < 10 & State %in% c("NH", "VT"), Muni_State := "Other Town in NH or VT"]
+mrg[Num_Muncipality < 10 & State %in% c("NH"), Muni_State := "Other Town in NH"]
+mrg[Num_Muncipality < 10 & State %in% c("VT"), Muni_State := "Other Town in VT"]
 mrg[Num_Muncipality < 10 & !State %in% c("NH", "VT"), Muni_State := "Other State"]
-town_levels <- mrg[, .N, by = Muni_State][order(-N)][!Muni_State %in% c("Other Town in NH or VT", "Other State")]$Muni_State
-mrg[, Muni_State := factor(Muni_State, levels = c(town_levels, "Other Town in NH or VT", "Other State"))]
+town_levels <- mrg[, .N, by = Muni_State][order(-N)][!Muni_State %in% c("Other Town in NH", "Other Town in VT", "Other State")]$Muni_State
+mrg[, Muni_State := factor(Muni_State, levels = c(town_levels, "Other Town in NH", "Other Town in VT", "Other State"))]
 mrg[, .N, keyby = Muni_State]
-mrg[, LebRes := ifelse(Muni_State %in% c("WEST LEBANON, NH", "LEBANON, NH"), "Leb Resident", "Not a Leb Res.")]
+mrg[, LebRes := ifelse(Muni_State %in% c("WEST LEBANON, NH", "LEBANON, NH"), "Lebanon Res.", "Not Lebanon Res.")]
 
 
 # 3. Income
