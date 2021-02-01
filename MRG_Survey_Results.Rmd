@@ -26,14 +26,16 @@ Overview {data-icon="fa-home"}
 Summary {data-width=200}
 --------------------------------------------
 
-### Number of Respondents
+<br>
+
+### Survey Respondents
 
 ```{r}
 value <- format(mrg[, .N], big.mark = ",", trim = TRUE)
 valueBox(value, caption = "Number of Survey Respondents", icon = "fa-check")
 ```
 
-### Daily MRG Users
+### Counts Daily Users
 
 ```{r}
 value <- format(round(mean(count_mrg[Location == "East of I-89",.(Count = round(sum(UsersEst))), 
@@ -416,6 +418,8 @@ Counts {data-icon="fa-line-chart"}
 
 Summary {data-width=200}
 --------------------------------------------
+
+<br>
 
 ### Average Daily Users (East of I-89)
 
